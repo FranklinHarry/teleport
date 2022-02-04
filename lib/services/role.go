@@ -1857,8 +1857,9 @@ func (set RoleSet) CanPortForward() bool {
 	return false
 }
 
-// RecordDesktopSession returns true if a role in the role set has enabled
-// desktop session recoring.
+// RecordDesktopSession returns true if the role set has enabled desktop
+// session recording. Recording is considered enabled if at least one
+// role in the set has enabled it.
 func (set RoleSet) RecordDesktopSession() bool {
 	for _, role := range set {
 		var bo *types.BoolOption
@@ -1870,6 +1871,18 @@ func (set RoleSet) RecordDesktopSession() bool {
 		}
 	}
 	return false
+}
+
+// DesktopClipboard returns true if the role set has enabled shared
+// clipboard for desktop sessions. Clipboard sharing is disabled if
+// one or more of the roles in the set has disabled it.
+func (set RoleSet) DesktopClipboard() bool {
+	for _, role := range set {
+		if !types.BoolDefaultTrue(role.GetOptions().DesktopClipboard) {
+			return false
+		}
+	}
+	return true
 }
 
 // MaybeCanReviewRequests attempts to guess if this RoleSet belongs
